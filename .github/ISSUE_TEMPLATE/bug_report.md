@@ -1,39 +1,50 @@
-name: 🐞 Bug Report
-description: Report something broken or misbehaving in the repository
-title: "[BUG] <short description>"
-labels: [bug]
-assignees: []
-
+name: Bug Report
+description: Report a bug in ADRScan
+title: "[BUG] "
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve this SOC 2 compliance toolkit!
+        Thanks for reporting a bug! Please fill out the sections below to help us fix it.
 
-  - type: input
+  - type: textarea
     id: description
     attributes:
-      label: What happened?
-      description: Describe the issue in detail
-      placeholder: "The GitHub Action failed to run on ..."
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe the bug...
     validations:
       required: true
 
   - type: textarea
-    id: logs
+    id: steps
     attributes:
-      label: Relevant logs or output
-      description: Paste any output or logs that may help us reproduce the issue
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run command '...'
+        2. See error
     validations:
-      required: false
+      required: true
 
-  - type: dropdown
-    id: impact
+  - type: textarea
+    id: expected
     attributes:
-      label: Impact severity
-      options:
-        - Low
-        - Medium
-        - High
+      label: Expected Behavior
+      description: A clear description of what you expected to happen
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Information about your environment
+      placeholder: |
+        - OS: [e.g. Linux, Windows, macOS]
+        - ADRScan version: [e.g. 0.1.0]
+        - Rust version: [e.g. 1.70.0]
     validations:
       required: true
