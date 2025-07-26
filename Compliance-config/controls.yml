@@ -1,0 +1,8 @@
+controls:
+  - id: CC1.1
+    title: Control Environment
+    description: Management establishes and maintains a commitment to integrity and ethical values.
+  - id: CC2.2
+    title: Logical Access
+    description: Logical access security is implemented to protect assets from unauthorized access.
+# complete with remaining controls
