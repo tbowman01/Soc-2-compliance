@@ -1,34 +1,30 @@
-name: "Scorecard Installer Action"
-description: "Installs and runs OpenSSF Scorecard against a GitHub repository and outputs results for compliance pipelines."
+name: "SOC 2 Compliance Audit"
+description: "Runs automated checks, collects evidence, and exports artifacts mapped to AICPA Trust Services Criteria for SOC 2 compliance."
 author: "Trevor Bowman"
 branding:
   icon: "shield"
-  color: "blue"
+  color: "green"
 
 inputs:
-  repo:
-    description: "GitHub repository to scan (format: owner/repo)"
-    required: true
-
-  ref:
-    description: "Git reference to scan (e.g. main, v1.0.0)"
+  controls-file:
+    description: "Path to the YAML or JSON file containing mapped Trust Services Criteria (e.g., controls-matrix.yml)"
     required: false
-    default: "main"
+    default: "controls/controls-matrix.yml"
 
-  results-file:
-    description: "Path to save Scorecard results in JSON format"
+  output-dir:
+    description: "Directory to save evidence and compliance artifacts"
     required: false
-    default: "scorecard-results.json"
+    default: "artifacts"
 
-  checks:
-    description: "Comma-separated list of checks to run. Leave blank to run all."
+  run-scorecard:
+    description: "Run OpenSSF Scorecard as part of audit"
     required: false
-    default: ""
+    default: "true"
 
-  dry_run:
-    description: "Run the scorecard check in dry-run mode (no write actions)"
+  run-trivy:
+    description: "Run Trivy vulnerability and SBOM scan"
     required: false
-    default: "false"
+    default: "true"
 
   verbose:
     description: "Enable verbose logging"
@@ -36,55 +32,57 @@ inputs:
     default: "false"
 
 outputs:
-  score:
-    description: "Aggregate Scorecard score (0–10)"
-
-  result_path:
-    description: "Path where results were saved"
-
-  checks_passed:
-    description: "Comma-separated list of passed checks"
+  scorecard-results:
+    description: "Path to Scorecard results JSON file"
+  trivy-report:
+    description: "Path to Trivy SBOM or vulnerability report"
+  audit-summary:
+    description: "Path to generated audit summary file (Markdown or JSON)"
 
 runs:
   using: "composite"
   steps:
-    - name: Set up environment
+    - name: Setup audit environment
       shell: bash
       run: |
-        echo "📦 Installing OpenSSF Scorecard..."
-        gh version || (echo "❌ GitHub CLI (gh) is required." && exit 1)
-        sudo apt-get update -qq
-        sudo apt-get install -y jq curl unzip
+        echo "🔧 Setting up SOC 2 audit environment"
+        mkdir -p "${{ inputs.output-dir }}"
 
+    - name: Run Scorecard (optional)
+      if: ${{ inputs.run-scorecard == 'true' }}
+      shell: bash
+      run: |
+        echo "🏁 Running OpenSSF Scorecard..."
         curl -sL https://github.com/ossf/scorecard/releases/latest/download/scorecard-linux-amd64 -o scorecard
         chmod +x scorecard
         sudo mv scorecard /usr/local/bin/scorecard
+        scorecard --repo="$GITHUB_REPOSITORY" --format=json > "${{ inputs.output-dir }}/scorecard-results.json"
+        echo "scorecard-results=${{ inputs.output-dir }}/scorecard-results.json" >> "$GITHUB_OUTPUT"
 
-    - name: Run Scorecard
-      id: run_scorecard
+    - name: Run Trivy Scan (optional)
+      if: ${{ inputs.run-trivy == 'true' }}
       shell: bash
       run: |
-        echo "🚀 Running Scorecard on repo: ${{ inputs.repo }}@${{ inputs.ref }}"
+        echo "🧪 Running Trivy SBOM and vulnerability scan..."
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+        trivy fs --scanners vuln,config,secret,license --format json --output "${{ inputs.output-dir }}/trivy-report.json" .
+        echo "trivy-report=${{ inputs.output-dir }}/trivy-report.json" >> "$GITHUB_OUTPUT"
 
-        if [[ "${{ inputs.dry_run }}" == "true" ]]; then
-          echo "🧪 Dry-run mode enabled."
-        fi
+    - name: Generate Audit Summary
+      shell: bash
+      run: |
+        echo "📝 Generating SOC 2 audit summary..."
+        SUMMARY_FILE="${{ inputs.output-dir }}/audit-summary.md"
+        echo "# SOC 2 Compliance Audit Summary" > "$SUMMARY_FILE"
+        echo "- Date: $(date)" >> "$SUMMARY_FILE"
+        echo "- Repository: $GITHUB_REPOSITORY" >> "$SUMMARY_FILE"
+        echo "- Scorecard: ${{ inputs.output-dir }}/scorecard-results.json" >> "$SUMMARY_FILE"
+        echo "- Trivy: ${{ inputs.output-dir }}/trivy-report.json" >> "$SUMMARY_FILE"
+        echo "- Controls File: ${{ inputs.controls-file }}" >> "$SUMMARY_FILE"
+        echo "audit-summary=$SUMMARY_FILE" >> "$GITHUB_OUTPUT"
 
-        SCORECARD_CMD="scorecard --repo=${{ inputs.repo }} --ref=${{ inputs.ref }} --format=json"
-
-        if [[ -n "${{ inputs.checks }}" ]]; then
-          SCORECARD_CMD="$SCORECARD_CMD --checks=${{ inputs.checks }}"
-        fi
-
-        echo "Command: $SCORECARD_CMD"
-
-        $SCORECARD_CMD > "${{ inputs.results-file }}"
-
-        echo "✅ Scorecard run complete. Output saved to: ${{ inputs.results-file }}"
-
-        SCORE=$(jq '.score' "${{ inputs.results-file }}" || echo 0)
-        PASSED=$(jq -r '.checks[] | select(.score == 10) | .name' "${{ inputs.results-file }}" | paste -sd "," -)
-
-        echo "score=$SCORE" >> "$GITHUB_OUTPUT"
-        echo "result_path=${{ inputs.results-file }}" >> "$GITHUB_OUTPUT"
-        echo "checks_passed=$PASSED" >> "$GITHUB_OUTPUT"
+    - name: List artifacts
+      shell: bash
+      run: |
+        echo "📂 Output Directory Contents:"
+        ls -lah "${{ inputs.output-dir }}"
