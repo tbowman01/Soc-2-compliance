@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/soc-2-audit_logo.png" alt=soc2audit Logo" width="60%"/></p>
+<p align="center"><img src="assets/soc-2-audit_logo.png" alt=soc2audit Logo" height="350px" width="60%"/></p>
 
 # SOC 2 Compliance Automation
 
@@ -10,7 +10,7 @@
 ![License](https://img.shields.io/github/license/tbowman01/Soc-2-compliance)
 ![Version](https://img.shields.io/github/v/release/tbowman01/Soc-2-compliance?sort=semver)
 
-Automated GitHub-based compliance control tracking and auditing for SOC 2 Type II.
+Automated GitHub-based compliance control tracking and auditing for SOC 2 compliance.
 This action automates the generation of SOC 2 compliance artifacts during your CI pipeline. 
 Integrating the following: 
 
