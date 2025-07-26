@@ -25,6 +25,7 @@ jobs:
         run: |
           pip install checkov
           npm install -g markdown-pdf
+          npm install -g danger
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
       - name: Validate dependencies
         shell: bash
