@@ -1,10 +1,16 @@
-# SOC 2 Compliance GitHub Action
+# SOC 2 Compliance Automation
 
 [![CI](https://github.com/tbowman01/Soc-2-compliance/actions/workflows/test.yml/badge.svg)](https://github.com/tbowman01/Soc-2-compliance/actions/workflows/test.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tbowman01/Soc-2-compliance?sort=semver)](https://github.com/tbowman01/Soc-2-compliance/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-This action automates the generation of SOC 2 compliance artifacts during your CI pipeline. It integrates:
+![PR Checklist Validator](https://github.com/tbowman01/Soc-2-compliance/actions/workflows/pr-checklist-validator.yml/badge.svg)
+![License](https://img.shields.io/github/license/tbowman01/Soc-2-compliance)
+![Version](https://img.shields.io/github/v/release/tbowman01/Soc-2-compliance?sort=semver)
+
+Automated GitHub-based compliance control tracking and auditing for SOC 2 Type II.
+This action automates the generation of SOC 2 compliance artifacts during your CI pipeline. 
+Integrating the following: 
 
 - IaC misconfiguration scanning via Checkov and tfsec
 - Dependency scanning (Trivy)
