@@ -1,0 +1,196 @@
+trust_services_criteria:
+  CC1:
+    title: Control Environment
+    criteria:
+      CC1.1:
+        description: "Demonstrates commitment to integrity and ethical values."
+        control: ""
+        owner: ""
+        status: ""
+      CC1.2:
+        description: "Board oversight of the system and controls."
+        control: ""
+        owner: ""
+        status: ""
+      CC1.3:
+        description: "Establishes structure, authority, and responsibility."
+        control: ""
+        owner: ""
+        status: ""
+      CC1.4:
+        description: "Demonstrates commitment to competence."
+        control: ""
+        owner: ""
+        status: ""
+      CC1.5:
+        description: "Enforces accountability for control responsibilities."
+        control: ""
+        owner: ""
+        status: ""
+
+  CC2:
+    title: Communication and Information
+    criteria:
+      CC2.1:
+        description: "Uses relevant and quality information for internal controls."
+        control: ""
+        owner: ""
+        status: ""
+      CC2.2:
+        description: "Communicates responsibilities internally and externally."
+        control: ""
+        owner: ""
+        status: ""
+
+  CC3:
+    title: Risk Assessment
+    criteria:
+      CC3.1:
+        description: "Specifies objectives and identifies risks."
+        control: ""
+        owner: ""
+        status: ""
+      CC3.2:
+        description: "Analyzes risks to achieve objectives."
+        control: ""
+        owner: ""
+        status: ""
+      CC3.3:
+        description: "Assesses fraud risk and mitigates."
+        control: ""
+        owner: ""
+        status: ""
+
+  CC4:
+    title: Monitoring
+    criteria:
+      CC4.1:
+        description: "Selects and develops monitoring activities."
+        control: ""
+        owner: ""
+        status: ""
+      CC4.2:
+        description: "Evaluates and communicates deficiencies."
+        control: ""
+        owner: ""
+        status: ""
+      CC4.3:
+        description: "Reports deficiencies timely and tracks remediation."
+        control: ""
+        owner: ""
+        status: ""
+
+  CC5:
+    title: Control Activities
+    criteria:
+      CC5.1:
+        description: "Selects control activities to mitigate risk."
+        control: ""
+        owner: ""
+        status: ""
+      CC5.2:
+        description: "Develops general IT controls."
+        control: ""
+        owner: ""
+        status: ""
+      CC5.3:
+        description: "Manages change through formal processes."
+        control: ""
+        owner: ""
+        status: ""
+      CC5.4:
+        description: "Manages third-party relationships and risks."
+        control: ""
+        owner: ""
+        status: ""
+      CC5.5:
+        description: "Protects system components and logical access."
+        control: ""
+        owner: ""
+        status: ""
+
+  A1:
+    title: Availability
+    criteria:
+      A1.1:
+        description: "Backs up and recovers systems/data."
+        control: ""
+        owner: ""
+        status: ""
+      A1.2:
+        description: "Maintains and tests business continuity plans."
+        control: ""
+        owner: ""
+        status: ""
+
+  PI1:
+    title: Processing Integrity
+    criteria:
+      PI1.1:
+        description: "Ensures processing is complete, valid, accurate, timely, and authorized."
+        control: ""
+        owner: ""
+        status: ""
+
+  C1:
+    title: Confidentiality
+    criteria:
+      C1.1:
+        description: "Identifies and classifies confidential information."
+        control: ""
+        owner: ""
+        status: ""
+      C1.2:
+        description: "Protects confidentiality through access controls, encryption, etc."
+        control: ""
+        owner: ""
+        status: ""
+      C1.3:
+        description: "Disposes of confidential data securely."
+        control: ""
+        owner: ""
+        status: ""
+
+  P1:
+    title: Privacy
+    criteria:
+      P1.1:
+        description: "Provides notice of data collection and usage."
+        control: ""
+        owner: ""
+        status: ""
+      P1.2:
+        description: "Provides data subjects with choice and consent mechanisms."
+        control: ""
+        owner: ""
+        status: ""
+      P1.3:
+        description: "Collects personal information with proper authorization."
+        control: ""
+        owner: ""
+        status: ""
+      P1.4:
+        description: "Uses, retains, and disposes personal info appropriately."
+        control: ""
+        owner: ""
+        status: ""
+      P1.5:
+        description: "Provides access and correction rights."
+        control: ""
+        owner: ""
+        status: ""
+      P1.6:
+        description: "Discloses and notifies data subjects as appropriate."
+        control: ""
+        owner: ""
+        status: ""
+      P1.7:
+        description: "Maintains information quality."
+        control: ""
+        owner: ""
+        status: ""
+      P1.8:
+        description: "Monitors privacy compliance and investigates complaints."
+        control: ""
+        owner: ""
+        status: ""
