@@ -1,0 +1,9 @@
+// Sample contents expected in this folder
+// compliance-artifacts/
+// ├── iac-checkov.json
+// ├── iac-tfsec.json
+// ├── github-settings.json
+// ├── trivy-deps.json
+// ├── secrets.json
+// ├── soc2-policy.md
+// ├── soc2-policy.pdf
