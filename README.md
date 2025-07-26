@@ -12,4 +12,44 @@ This action automates the generation of SOC 2 compliance artifacts during your C
 - GitHub repo metadata capture
 - Policy document generation from structured controls
 
-...
+---
+
+## 🚀 Usage
+
+```yaml
+jobs:
+  soc2-compliance-audit:
+    uses: ./.github/actions/soc2-compliance
+    with:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Ensure the following files and folders exist:
+
+```
+/scripts/
+  validate-dependencies.sh
+  collect-artifacts.sh
+  generate-policies.sh
+/compliance-config/
+  controls.yml
+```
+
+---
+
+## ✅ Requirements
+
+This action expects the following tools to be available:
+- `gh`
+- `docker`
+- `trufflehog`
+- `tfsec`
+- `checkov`
+- `python3`
+- `npx`
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
