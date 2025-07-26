@@ -1,0 +1,216 @@
+# SOC 2 Compliance GitHub Action
+
+[![CI](https://github.com/your-org/soc2-compliance-action/actions/workflows/test.yml/badge.svg)](https://github.com/your-org/soc2-compliance-action/actions/workflows/test.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/your-org/soc2-compliance-action?sort=semver)](https://github.com/your-org/soc2-compliance-action/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+This action automates the generation of SOC 2 compliance artifacts during your CI pipeline. It integrates:
+
+- IaC misconfiguration scanning via Checkov and tfsec
+- Dependency scanning (Trivy)
+- Secrets scanning (TruffleHog)
+- GitHub repo metadata capture
+- Policy document generation from structured controls
+
+---
+
+## 🚀 Usage
+
+```yaml
+jobs:
+  soc2-compliance-audit:
+    uses: ./.github/actions/soc2-compliance
+    with:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Ensure the following files and folders exist:
+
+```
+/scripts/
+  validate-dependencies.sh
+  collect-artifacts.sh
+  generate-policies.sh
+/compliance-config/
+  controls.yml
+```
+
+---
+
+## ✅ Requirements
+
+This action expects the following tools to be available:
+- `gh`
+- `docker`
+- `trufflehog`
+- `tfsec`
+- `checkov`
+- `python3`
+- `npx`
+
+---
+
+## 🧪 Tests
+
+### 1. Test Workflow (`.github/workflows/test.yml`)
+
+```yaml
+name: Test SOC2 Compliance Audit
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-soc2-audit:
+    runs-on: ubuntu-latest
+    name: Test GitHub Action
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run SOC2 Compliance Action
+        uses: ./.github/actions/soc2-compliance
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify output
+        run: |
+          test -f compliance-artifacts/iac-checkov.json
+          test -f compliance-artifacts/soc2-policy.md
+          echo "✅ Test passed: Artifacts generated."
+```
+
+### 2. Local Testing with `act`
+
+**Install act:**
+```bash
+brew install act # or follow https://github.com/nektos/act
+```
+
+**Run local test:**
+```bash
+act pull_request --job test-soc2-audit -W .github/workflows/test.yml
+```
+
+Ensure all required secrets and env variables are defined in a `.secrets` file or passed inline:
+```ini
+GITHUB_TOKEN=ghp_your_token_here
+```
+
+---
+
+## 📦 Semantic Versioning
+
+This project follows [Semantic Versioning 2.0.0](https://semver.org/):
+
+- `MAJOR` — breaking changes
+- `MINOR` — new features
+- `PATCH` — fixes and small enhancements
+
+To release:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Ensure the GitHub release UI matches the latest tag. Consumers can then pin like:
+```yaml
+uses: your-org/soc2-compliance-action@v1
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! To get started:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/something`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/something`)
+5. Open a pull request
+
+Please follow the [Conventional Commits](https://www.conventionalcommits.org/) style and include tests for new features.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 📂 Supporting Files
+
+### LICENSE
+```text
+MIT License
+
+Copyright (c) 2025
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### CONTRIBUTING.md
+```markdown
+# Contributing Guide
+
+We welcome contributions to improve and enhance this SOC 2 Compliance GitHub Action!
+
+## 🛠 Development Setup
+- Fork this repository and clone your fork.
+- Make sure you have `act`, `docker`, `node`, and `python3` installed.
+- Use `act` to run test workflows locally before submitting.
+
+## 🔍 Code Style
+- Use [Conventional Commits](https://www.conventionalcommits.org/).
+- Keep PRs small and focused.
+- Include unit tests where possible.
+
+## ✅ Submitting a PR
+- Create a descriptive branch name (e.g. `fix/secrets-scan-error`)
+- Include a summary of changes
+- Tag reviewers as appropriate
+
+Thank you for your contribution!
+```
+
+### CODE_OF_CONDUCT.md
+```markdown
+# Code of Conduct
+
+This project follows the [Contributor Covenant](https://www.contributor-covenant.org/) Code of Conduct.
+
+## Our Pledge
+In the interest of fostering an open and welcoming environment, we pledge to make participation in our project and community a harassment-free experience for everyone.
+
+## Enforcement
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the maintainers at [EMAIL OR ISSUE LINK].
+```
+
+---
+
+## 📦 Marketplace Preparation
+
+To prepare this Action for the GitHub Marketplace:
+
+1. ✅ Ensure `action.yml` exists at root or nested path with `name`, `description`, `inputs`, `runs` keys
+2. ✅ Include a `README.md` that documents usage and intent clearly
+3. ✅ Include tags and topics in repository metadata (e.g., `compliance`, `soc2`, `security`, `github-actions`)
+4. ✅ Add an `icon.svg` and `logo.png` if branding is desired
+5. ✅ Set appropriate visibility (usually `public`) for publication
+6. 🕵️ Validate the action with `act` or manual test pipelines
+7. 🚀 Publish from the GitHub Action tab or via `gh release` + `git 
