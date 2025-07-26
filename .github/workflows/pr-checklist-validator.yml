@@ -1,47 +1,88 @@
-name: PR Checklist Validator
+name: Enhanced PR Validation
 
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
 jobs:
-  validate-pr:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate PR Title (Conventional Commit style optional)
+      - name: Extract PR body and title
+        id: pr
         run: |
-          echo "PR Title: ${{ github.event.pull_request.title }}"
-          if [[ ! "${{ github.event.pull_request.title }}" =~ ^(feat|fix|docs|refactor|test|chore)(\(.+\))?:\ .+ ]]; then
-            echo "::warning title=Non-standard PR Title::Consider using conventional commit style (e.g., feat: add SOC 2 CC6.1 control mapping)"
+          echo "::set-output name=title::${{ github.event.pull_request.title }}"
+          echo "::set-output name=body::${{ github.event.pull_request.body }}"
+
+      - name: Validate PR Title Format
+        run: |
+          echo "PR Title: ${{ steps.pr.outputs.title }}"
+          if [[ ! "${{ steps.pr.outputs.title }}" =~ ^(feat|fix|docs|refactor|test|chore)(\(.+\))?:\ .+ ]]; then
+            echo "::warning title=Non-standard PR Title::Consider using Conventional Commit format."
           fi
 
-      - name: Check for SOC 2 References in PR Body
+      - name: Check for SOC 2 Criteria in PR Body
+        id: soc2check
         run: |
-          echo "PR Body: ${{ github.event.pull_request.body }}" > pr_body.txt
-          if ! grep -Eq 'CC[0-9]+\.[0-9]+' pr_body.txt; then
-            echo "::error title=Missing SOC 2 Criteria::Please reference at least one SOC 2 criteria code (e.g., CC6.1)"
-            exit 1
+          echo "${{ steps.pr.outputs.body }}" > pr_body.txt
+          grep -Eo 'CC[0-9]+\.[0-9]+' pr_body.txt | sort | uniq > codes.txt || true
+          FOUND=$(cat codes.txt | xargs)
+          if [ -z "$FOUND" ]; then
+            echo "::error title=Missing SOC 2 Criteria::No SOC 2 control references (e.g., CC6.1) found in PR body."
+            echo "missing=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Found criteria: $FOUND"
+            echo "missing=false" >> "$GITHUB_OUTPUT"
+            echo "codes=$FOUND" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check for PR Checklist Items
+      - name: Auto-label PR by Criteria Category
+        if: steps.soc2check.outputs.missing == 'false'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: |
+            ${{ join(fromJson('[''${{ steps.soc2check.outputs.codes }}'']') | map(code => (code startsWith('CC6.') && 'Security') || (code startsWith('CC7.') && 'Availability') || (code startsWith('CC8.') && 'Confidentiality') || 'Other')) }}
+
+      - name: Comment Missing Checklist Items
         run: |
-          REQUIRED_ITEMS=("README.md updated" "Control implementation details are documented" "No secrets" "Tests pass")
-          for item in "${REQUIRED_ITEMS[@]}"; do
+          CHECKLIST=("README.md updated" "No secrets" "Tests pass")
+          for item in "${CHECKLIST[@]}"; do
             if ! grep -q "$item" pr_body.txt; then
-              echo "::warning title=Missing Checklist Item::$item not confirmed in PR body"
+              echo "- [ ] $item" >> missing.md
             fi
           done
+          if [ -f missing.md ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body "⚠️ Missing checklist items detected:\n\n\`\`\`
+$(cat missing.md)
+\`\`\`\nPlease update the PR body to confirm these."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Lint Markdown Files
+      - name: Run Danger for Inline Feedback
+        uses: danger/danger@11.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --fail-on-errors
+
+      - name: Markdown Lint
         uses: avto-dev/markdown-lint@v1
         with:
           config: '.markdownlint.yml'
         continue-on-error: true
 
-      - name: Lint YAML Files
+      - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
         with:
           config_file: .yamllint.yml
