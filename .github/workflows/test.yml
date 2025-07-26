@@ -10,7 +10,7 @@ on:
       - main
       - develop
   workflow_dispatch:
-
+  
 jobs:
   test:
     name: Run Scorecard Installer Tests
@@ -69,3 +69,14 @@ jobs:
 
       - name: Show help and confirm local testability
         run: act --list
+
+  run-scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Scorecard Installer Action
+        uses: tbowman01/scorecard-installer-action@main
+        with:
+          repo: "tbowman01/scorecard-installer-action"
