@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in ADRScan
+description: Report a bug in Soc-2-compliance
 title: "[BUG] "
 labels: ["bug"]
 body:
