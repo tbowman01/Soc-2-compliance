@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/assets/soc-2-audit_logo.png" alt=soc2audit Logo" width="60%"/></p>
+<p align="center"><img src="assets/soc-2-audit_logo.png" alt=soc2audit Logo" width="60%"/></p>
 
 # SOC 2 Compliance Automation
 
