@@ -46,3 +46,12 @@ jobs:
         with:
           name: soc2-artifacts
           path: compliance-artifacts/
+
+      - name: Compress artifacts
+        run: zip -r soc2-evidence.zip compliance-artifacts/
+      
+      - name: Upload zipped report
+        uses: actions/upload-artifact@v4
+        with:
+          name: soc2-evidence
+          path: soc2-evidence.zip
