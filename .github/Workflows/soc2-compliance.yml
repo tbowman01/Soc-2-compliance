@@ -1,0 +1,48 @@
+name: SOC 2 Compliance Scan
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python & Node.js
+        uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install tools
+        run: |
+          pip install checkov
+          npm install -g markdown-pdf
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+
+      - name: Run Checkov for IaC misconfigurations
+        run: |
+          mkdir -p compliance-artifacts
+          checkov -d . --output json > compliance-artifacts/iac-checkov.json
+
+      - name: Run tfsec as second layer
+        run: tfsec . --format json > compliance-artifacts/iac-tfsec.json
+
+      - name: Scan GitHub settings and repo metadata
+        run: bash scripts/collect-artifacts.sh
+
+      - name: Generate SOC 2 Policy Docs
+        run: bash scripts/generate-policies.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: soc2-artifacts
+          path: compliance-artifacts/
