@@ -1,4 +1,4 @@
-name: SOC 2 Compliance Scan
+name: SOC 2 Compliance Audit
 
 on:
   push:
@@ -26,6 +26,9 @@ jobs:
           pip install checkov
           npm install -g markdown-pdf
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+      - name: Validate dependencies
+        shell: bash
+        run: bash ./scripts/validate-dependencies.sh
 
       - name: Run Checkov for IaC misconfigurations
         run: |
