@@ -1,1 +1,90 @@
-.keepme
+name: "Scorecard Installer Action"
+description: "Installs and runs OpenSSF Scorecard against a GitHub repository and outputs results for compliance pipelines."
+author: "Trevor Bowman"
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  repo:
+    description: "GitHub repository to scan (format: owner/repo)"
+    required: true
+
+  ref:
+    description: "Git reference to scan (e.g. main, v1.0.0)"
+    required: false
+    default: "main"
+
+  results-file:
+    description: "Path to save Scorecard results in JSON format"
+    required: false
+    default: "scorecard-results.json"
+
+  checks:
+    description: "Comma-separated list of checks to run. Leave blank to run all."
+    required: false
+    default: ""
+
+  dry_run:
+    description: "Run the scorecard check in dry-run mode (no write actions)"
+    required: false
+    default: "false"
+
+  verbose:
+    description: "Enable verbose logging"
+    required: false
+    default: "false"
+
+outputs:
+  score:
+    description: "Aggregate Scorecard score (0–10)"
+
+  result_path:
+    description: "Path where results were saved"
+
+  checks_passed:
+    description: "Comma-separated list of passed checks"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up environment
+      shell: bash
+      run: |
+        echo "📦 Installing OpenSSF Scorecard..."
+        gh version || (echo "❌ GitHub CLI (gh) is required." && exit 1)
+        sudo apt-get update -qq
+        sudo apt-get install -y jq curl unzip
+
+        curl -sL https://github.com/ossf/scorecard/releases/latest/download/scorecard-linux-amd64 -o scorecard
+        chmod +x scorecard
+        sudo mv scorecard /usr/local/bin/scorecard
+
+    - name: Run Scorecard
+      id: run_scorecard
+      shell: bash
+      run: |
+        echo "🚀 Running Scorecard on repo: ${{ inputs.repo }}@${{ inputs.ref }}"
+
+        if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+          echo "🧪 Dry-run mode enabled."
+        fi
+
+        SCORECARD_CMD="scorecard --repo=${{ inputs.repo }} --ref=${{ inputs.ref }} --format=json"
+
+        if [[ -n "${{ inputs.checks }}" ]]; then
+          SCORECARD_CMD="$SCORECARD_CMD --checks=${{ inputs.checks }}"
+        fi
+
+        echo "Command: $SCORECARD_CMD"
+
+        $SCORECARD_CMD > "${{ inputs.results-file }}"
+
+        echo "✅ Scorecard run complete. Output saved to: ${{ inputs.results-file }}"
+
+        SCORE=$(jq '.score' "${{ inputs.results-file }}" || echo 0)
+        PASSED=$(jq -r '.checks[] | select(.score == 10) | .name' "${{ inputs.results-file }}" | paste -sd "," -)
+
+        echo "score=$SCORE" >> "$GITHUB_OUTPUT"
+        echo "result_path=${{ inputs.results-file }}" >> "$GITHUB_OUTPUT"
+        echo "checks_passed=$PASSED" >> "$GITHUB_OUTPUT"
